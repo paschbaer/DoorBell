@@ -6,6 +6,8 @@
 #include <tr064.h>
 #include <PubSubClient.h>
 
+#include <user_interface.h>
+
 #define LED_BUILTIN 2
 
 // Replace with your network credentials
@@ -89,17 +91,64 @@ void sendMqtt(const char* const payload)
   mqtt_client.loop();
 
   unsigned long ulTime = millis() - ulStart;
-  Serial.printf("time from reset: %lu ms\r\n", ulTime);
+  Serial.printf("time from wake up: %lu ms\r\n", ulTime);
+}
+
+void restoreWifi(void)
+{
+  ulStart = millis();
+
+  wifi_fpm_close();
+  wifi_set_opmode(STATION_MODE);
+  wifi_station_connect();
+  Serial.println("Woke up from sleep");
+}
+
+void sleepNow()
+{
+  Serial.println("going to light sleep...");
+  wifi_station_disconnect();
+  wifi_set_opmode(NULL_MODE);
+
+  //enable light sleep
+  Serial.println("set 'light sleep'\r\n");
+  wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+
+  //register one or more wake-up interrupts
+  //gpio_pin_wakeup_enable(D2, GPIO_PIN_INTR_HILEVEL);
+  Serial.println("set 'wake up pin'\r\n");
+  gpio_pin_wakeup_enable(D3, GPIO_PIN_INTR_LOLEVEL);
+
+  //Serial.println("enable force sleep)\r\n");  
+  wifi_fpm_open();
+  delay(100);
+
+  //function for clearing all previously set wake interrupts:
+  //gpio_pin_wakeup_disable();
+
+  //optionally, can register a callback function using
+  wifi_fpm_set_wakeup_cb(restoreWifi);
+
+  //actually enter light sleep:
+  //the special timeout value of 0xFFFFFFF triggers indefinite
+  //light sleep (until any of the GPIO interrupts above is triggered)
+  wifi_fpm_do_sleep(0xFFFFFFF);
+  //the CPU will only enter light sleep on the next idle cycle, which
+  //can be triggered by a short delay()
+  delay(100);
 }
 
 void setup() 
 {
   ulStart = millis();
 
+  gpio_init();
+
   pinMode(LED_BUILTIN, OUTPUT);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setDebugOutput(true);
+  Serial.println("\r\n");
 
   // Connect to Wi-Fi network with SSID and password
   unsigned long wifiloop = 0;
@@ -152,9 +201,12 @@ void setup()
 
 void loop()
 {
+  sleepNow();
+
+  // code will continue here after the interrupt
+  Serial.println("continue ...\r\n");
+
   //ringAllPhones();
 
   sendMqtt("ring");
-
-  ESP.deepSleep(0); 
 }
