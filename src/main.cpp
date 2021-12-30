@@ -14,10 +14,10 @@
 const char* ssid     = "FRITZ!Box 6591 Cable GX";
 const char* password = "87811180949226958397";
 
-const char USER[] = "doorbell";
-const char PASSWORD[] = "doorbell.12683.82B";
+const char USER[] = ""; //change
+const char PASSWORD[] = ""; //change
 const char FRITZBOX_IP[] = "192.168.178.1";
-const int FRITZBOX_PORT = 49000;
+const int FRITZBOX_PORT =49000;
 
 const IPAddress STATIC_IP(192, 168, 178, 201);
 const IPAddress GATEWAY(192, 168, 178, 1);
@@ -209,7 +209,7 @@ void loop()
   // code will continue here after the interrupt
   Serial.println("continue ...\r\n");
 
-  //ringAllPhones();
-
   sendMqtt("ring");
+
+  //ringAllPhones();
 }
