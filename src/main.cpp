@@ -75,15 +75,16 @@ void loop()
 
   Serial.println("TR-064 - try round call\r\n");
 
-  Serial.println("TR-064 - init ...");
+  /*Serial.println("TR-064 - init ...");
   tr064_connection.init();
 
-  Serial.println(" done\r\n");
+  Serial.println(" done\r\n");*/
 
   String tr064_service = "urn:dslforum-org:service:X_VoIP:1";
   String call_params[][2] = {{"NewX_AVM-DE_PhoneNumber", "**9"}}; //Die Telefonnummer **9 ist der Fritzbox-Rundruf.
 
-  if (tr064_connection.action(tr064_service, "X_AVM-DE_DialNumber", call_params, 1) == true)
+  //if (tr064_connection.action(tr064_service, "X_AVM-DE_DialNumber", call_params, 1) == true)
+  if (tr064_connection.action(tr064_service, "X_AVM-DE_DialNumber", call_params, 1, "/upnp/control/x_voip") == true)
   {
     Serial.println("TR-064 action successfull\r\n");
   }
