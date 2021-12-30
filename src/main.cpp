@@ -17,6 +17,13 @@ const char PASSWORD[] = "doorbell.12683.82B";
 const char FRITZBOX_IP[] = "192.168.178.1";
 const int FRITZBOX_PORT = 49000;
 
+const IPAddress STATIC_IP(192, 168, 178, 201);
+const IPAddress GATEWAY(192, 168, 178, 1);
+const IPAddress SUBNET(255, 255, 255, 0);
+const IPAddress DNS(GATEWAY);
+
+const char DEVICE_NAME[] = "DoorBell";
+
 const char* mqtt_broker = "192.168.178.55";
 const char* topic_doorbell = "doorbell/ring";
 
@@ -101,6 +108,10 @@ void setup()
   Serial.println(ssid);
 
   WiFi.disconnect();
+
+  WiFi.hostname(DEVICE_NAME);
+  WiFi.config(STATIC_IP, SUBNET, GATEWAY, DNS);
+
   WiFi.enableSTA(true);
   WiFi.setPhyMode(WIFI_PHY_MODE_11N);
   WiFi.setOutputPower(20.5);
