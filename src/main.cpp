@@ -92,11 +92,15 @@ void sendMqtt(const char* const payload)
 
   unsigned long ulTime = millis() - ulStart;
   Serial.printf("time from wake up: %lu ms\r\n", ulTime);
+
+  delay(500);
 }
 
 void restoreWifi(void)
 {
   ulStart = millis();
+
+  digitalWrite(LED_BUILTIN, LOW);
 
   wifi_fpm_close();
   wifi_set_opmode(STATION_MODE);
@@ -135,6 +139,7 @@ void sleepNow()
   wifi_fpm_do_sleep(0xFFFFFFF);
   //the CPU will only enter light sleep on the next idle cycle, which
   //can be triggered by a short delay()
+  digitalWrite(LED_BUILTIN, HIGH);
   delay(100);
 }
 
@@ -151,7 +156,6 @@ void setup()
   Serial.println("\r\n");
 
   // Connect to Wi-Fi network with SSID and password
-  unsigned long wifiloop = 0;
   delay(100);
   Serial.print("\r\nConnecting to ");
   Serial.println(ssid);
@@ -164,15 +168,14 @@ void setup()
   WiFi.enableSTA(true);
   WiFi.setPhyMode(WIFI_PHY_MODE_11N);
   WiFi.setOutputPower(20.5);
-  WiFi.enableInsecureWEP();
+  //WiFi.enableInsecureWEP();
 
   WiFi.begin(ssid, password);
   wl_status_t wifiStatus = WiFi.status();
   while (wifiStatus != WL_CONNECTED)
   {
-    delay(2000);
+    delay(1000);
     Serial.println(WiFi.status());
-    digitalWrite(LED_BUILTIN, (wifiloop++ % 2 == 1) ? HIGH : LOW);
 
     WiFi.printDiag(Serial);
     //WiFi.printStatus(Serial);
